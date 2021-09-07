@@ -84,6 +84,7 @@ function Analog() {
    */
   const toolTipHandler = useCallback((type: boolean) => {
     if (type) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       tm = setInterval(() => {
         const { time } = getTime();
         const value = `${time.hour}시 ${time.min}분 ${time.sec}초`;
