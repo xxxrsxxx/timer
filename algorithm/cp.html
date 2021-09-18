@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>출력결과</title>
+  </head>
+  <body>
+    <script>
+      //https://xx-bucket.s3.ap-northeast-2.amazonaws.com/ct_cake.png
+      function solution2(d) {
+        let answer;
+        let max = Number.MIN_SAFE_INTEGER;
+        let str = d.toString().replace(/,/g, "");
+        let nm = new Map();
+
+        for (let x of str) {
+          if (nm.has(x)) nm.set(x, nm.get(x) + 1);
+          else nm.set(x, 1);
+        }
+
+        for (let [key, val] of nm) {
+          if (max < val) max = val;
+          if (key === "6" || key === "9") {
+            const p = nm.has("6");
+            const p2 = nm.has("9");
+            if (max === val) {
+              if (p) if (!p2) max = max - 1;
+              if (p2) if (!p) max = max - 1;
+            }
+          }
+        }
+        answer = max;
+        return answer;
+      }
+
+      console.log("2", solution2([23, 61, 46]));
+      console.log("3", solution2([44, 33, 55, 69, 62]));
+    </script>
+  </body>
+</html>
