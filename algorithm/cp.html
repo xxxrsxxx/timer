@@ -1,39 +1,45 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>출력결과</title>
+    <title>TEST</title>
   </head>
   <body>
     <script>
       //https://aws/s3/cp_cake.png
-      function solution2(d) {
+      function solution(ages) {
         let answer;
-        let max = Number.MIN_SAFE_INTEGER;
-        let str = d.toString().replace(/,/g, "");
-        let nm = new Map();
+        let max = Number.MIN_SAFE_INTEGER; // 초 세트 갯수
+        let str = ages.toString().replace(/,/g, ""); // 나이값 문자화
 
+        let nm = new Map(); // 나이값 체크 인스턴스 생성
+
+        // 나이 체크 및 갯수 셋팅
         for (let x of str) {
           if (nm.has(x)) nm.set(x, nm.get(x) + 1);
           else nm.set(x, 1);
         }
 
+        // 체크된 나이 값 유효성 로직
         for (let [key, val] of nm) {
-          if (max < val) max = val;
+          if (max < val) max = val; // 최대 초세트 값 설정
+          // 예외 경우의 수 체크
           if (key === "6" || key === "9") {
-            const p = nm.has("6");
-            const p2 = nm.has("9");
+            const s = nm.has("6");
+            const n = nm.has("9");
+            // 예외 케이스 최대 초세트 필요 값 재연산
             if (max === val) {
-              if (p) if (!p2) max = max - 1;
-              if (p2) if (!p) max = max - 1;
+              //  초 세트 최대치 === 예외 케이스 셋팅 된 갯수
+              // 대체 할 수 있다면 최대 초 세트 하나 제거
+              if (s) if (!n) max = max - 1;
+              if (n) if (!s) max = max - 1;
             }
           }
         }
         answer = max;
         return answer;
       }
-
-      console.log("2", solution2([23, 61, 46]));
-      console.log("3", solution2([44, 33, 55, 69, 62]));
+      console.log("result", solution([23, 61, 46]));
+      console.log("result2", solution([44, 33, 55, 69, 62]));
     </script>
   </body>
 </html>

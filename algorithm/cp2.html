@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TEST</title>
+  </head>
+  <body>
+    <script>
+      function solution(laser) {
+        let answer;
+        let array = laser;
+        let dummy = []; // 더미 배열
+
+        // 음수 양수 체크 함수
+        function validationNum(num) {
+          return num >= 0;
+        }
+
+        //절대값 반환 로직 = 레이저 기울기로 판단
+        const reducer = (prev, current) => {
+          const pv = validationNum(prev);
+          const cv = validationNum(current);
+          return pv && cv
+            ? Math.abs(prev / current)
+            : -Math.abs(prev / current);
+        };
+
+        // 레이저 2차 배열 검증
+        array.forEach((e) => {
+          const k = e;
+          const num = k.reduce(reducer);
+          // 반환된 기울기 넘버 더미 저장
+          dummy.push(num);
+        });
+        // 중복된 더미값 제거
+        const result = [...new Map(dummy.map((item) => [item, item])).values()];
+        answer = result.length;
+        return answer;
+      }
+
+      console.log(
+        "laser",
+        solution([
+          [2, 2],
+          [4, 4],
+          [1, 4],
+          [-1, -4],
+        ])
+      );
+    </script>
+  </body>
+</html>
