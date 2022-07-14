@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 
-import { getToolTip, HookMain } from "../store/commerce/main";
+import { getToolTip, HookMain } from "../../store/commerce/main";
 
 type timeType = { hour: number; min: number; sec: number };
 
@@ -17,7 +17,7 @@ type itemsType = {
   timePoint: number;
   h: number;
   dr: number;
-}[];
+};
 
 type ClockNumType = { id: number; x: number; y: number };
 
@@ -41,10 +41,10 @@ function getTime() {
 }
 
 function Analog() {
-  let tm: any = null;
+  let tm: any = useRef(null);
   const [clockNumArray, setClockNumArray] = useState<ClockNumType[]>([]);
-  const { timePoint } = getTime();
   const { mainState, dispatch } = HookMain();
+  const [needles, setNeedles] = useState<itemsType[]>([]);
 
   useEffect(() => {
     /**
@@ -59,9 +59,16 @@ function Analog() {
       rad = exp * (i - 3);
       x = Math.cos(rad) * 140;
       y = Math.sin(rad) * 140 - 5;
-
       result = [...result, { id: i, x, y }];
     }
+    const { timePoint } = getTime();
+    let _needles: itemsType[] = [];
+    _needles = _needles.concat([
+      { id: 0, type: "hour", timePoint: timePoint.hr, h: 110, dr: 43200 },
+      { id: 1, type: "min", timePoint: timePoint.mr, h: 138, dr: 3600 },
+      { id: 2, type: "sec", timePoint: timePoint.sr, h: 150, dr: 60 },
+    ]);
+    setNeedles((state:itemsType[]) => [...state,..._needles]);
     setClockNumArray(result);
   }, []);
 
@@ -69,35 +76,38 @@ function Analog() {
    * @name items
    * @description 시계 바늘 정보
    */
-  const items = useMemo(() => {
-    const config: itemsType = [
-      { id: 0, type: "hour", timePoint: timePoint.hr, h: 110, dr: 43200 },
-      { id: 1, type: "min", timePoint: timePoint.mr, h: 138, dr: 3600 },
-      { id: 2, type: "sec", timePoint: timePoint.sr, h: 150, dr: 60 },
-    ];
-    return config;
-  }, []);
+  // const items = useMemo(() => {
+  //   const config: itemsType[] = [
+  //     { id: 0, type: "hour", timePoint: timePoint.hr, h: 110, dr: 43200 },
+  //     { id: 1, type: "min", timePoint: timePoint.mr, h: 138, dr: 3600 },
+  //     { id: 2, type: "sec", timePoint: timePoint.sr, h: 150, dr: 60 },
+  //   ];
+  //   return config;
+  // }, []);
 
   /**
    * @name toolTipHandler
    * @description toolTip handler 상태 관리 로직
    */
-  const toolTipHandler = useCallback((type: boolean) => {
-    if (type) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      tm = setInterval(() => {
-        const { time } = getTime();
-        const value = `${time.hour}시 ${time.min}분 ${time.sec}초`;
-        //setTool({ active: true, value });
-        dispatch(getToolTip({ active: true, value }));
-      }, 500);
-    }
-    if (!type) {
-      clearInterval(tm);
-      dispatch(getToolTip({ active: false, value: "" }));
-    }
-  }, []);
+  const toolTipHandler = useCallback(
+    (confirm: boolean) => {
+      if (confirm) {
+        tm.current = setInterval(() => {
+          const { time } = getTime();
+          const value = `${time.hour}시 ${time.min}분 ${time.sec}초`;
+          //setTool({ active: true, value });
+          dispatch(getToolTip({ active: true, value }));
+        }, 500);
+      }
+      if (!confirm) {
+        clearInterval(tm.current);
+        dispatch(getToolTip({ active: false, value: "" }));
+      }
+    },
+    [dispatch]
+  );
 
+  // @ts-ignore
   return (
     <>
       <Clock
@@ -116,11 +126,12 @@ function Analog() {
           ))}
         </ClockNum>
         <NeedlesWrap>
-          {items.map((e) => (
-            <NeedlesItems key={`items_${e.id}`} dr={e.dr}>
-              <Needles pt={e.timePoint} h={e.h} />
-            </NeedlesItems>
-          ))}
+          {needles.length &&
+            needles.map((e) => (
+              <NeedlesItems key={`items_${e.id}`} dr={e.dr}>
+                <Needles pt={e.timePoint} h={e.h} />
+              </NeedlesItems>
+            ))}
         </NeedlesWrap>
       </Clock>
       {mainState.active && <div>{mainState.value}</div>}
