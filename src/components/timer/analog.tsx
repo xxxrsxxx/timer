@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 
-import { getToolTip, HookMain } from "../../store/commerce/main";
+import { getToolTip, useHookMain } from "../../store/commerce/main";
 
-type timeType = { hour: number; min: number; sec: number };
+type TimeType = { hour: number; min: number; sec: number };
 
-type timePointType = {
+type TimePointType = {
   hr: number;
   mr: number;
   sr: number;
 };
 
-type itemsType = {
+type ItemsType = {
   id: number;
   type: string;
   timePoint: number;
@@ -27,12 +27,12 @@ type ClockNumType = { id: number; x: number; y: number };
  */
 function getTime() {
   const now: any = new Date();
-  const time: timeType = {
+  const time: TimeType = {
     hour: now.getHours() % 12,
     min: now.getMinutes(),
     sec: now.getSeconds(),
   };
-  const timePoint: timePointType = {
+  const timePoint: TimePointType = {
     hr: 30 * time.hour + 0.5 * time.min,
     mr: 6 * time.min + 0.1 * time.sec,
     sr: 6 * time.sec,
@@ -43,8 +43,8 @@ function getTime() {
 function Analog() {
   let tm: any = useRef(null);
   const [clockNumArray, setClockNumArray] = useState<ClockNumType[]>([]);
-  const { mainState, dispatch } = HookMain();
-  const [needles, setNeedles] = useState<itemsType[]>([]);
+  const { mainState, dispatch } = useHookMain();
+  const [needles, setNeedles] = useState<ItemsType[]>([]);
 
   useEffect(() => {
     /**
@@ -62,13 +62,13 @@ function Analog() {
       result = [...result, { id: i, x, y }];
     }
     const { timePoint } = getTime();
-    let _needles: itemsType[] = [];
+    let _needles: ItemsType[] = [];
     _needles = _needles.concat([
       { id: 0, type: "hour", timePoint: timePoint.hr, h: 110, dr: 43200 },
       { id: 1, type: "min", timePoint: timePoint.mr, h: 138, dr: 3600 },
       { id: 2, type: "sec", timePoint: timePoint.sr, h: 150, dr: 60 },
     ]);
-    setNeedles((state:itemsType[]) => [...state,..._needles]);
+    setNeedles((state: ItemsType[]) => [...state, ..._needles]);
     setClockNumArray(result);
   }, []);
 
@@ -77,7 +77,7 @@ function Analog() {
    * @description 시계 바늘 정보
    */
   // const items = useMemo(() => {
-  //   const config: itemsType[] = [
+  //   const config: ItemsType[] = [
   //     { id: 0, type: "hour", timePoint: timePoint.hr, h: 110, dr: 43200 },
   //     { id: 1, type: "min", timePoint: timePoint.mr, h: 138, dr: 3600 },
   //     { id: 2, type: "sec", timePoint: timePoint.sr, h: 150, dr: 60 },

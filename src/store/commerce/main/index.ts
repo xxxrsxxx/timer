@@ -33,7 +33,7 @@ export const mainSlice = createSlice({
 
 export const { getToolTip } = mainSlice.actions;
 
-export function HookMain() {
+export function useHookMain() {
   // The `state` arg is correctly typed as `RootState` already
   const mainState = useAppSelector((state: RootState) => state.commerce.Main);
   const dispatch = useAppDispatch();
